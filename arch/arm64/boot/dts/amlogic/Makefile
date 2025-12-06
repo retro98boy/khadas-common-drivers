@@ -6,3 +6,4 @@ dtb-y += kvim3l.dtb
 dtb-y += kvim1s.dtb
 dtb-y += t7-a311d2-tvpro-4g.dtb
 dtb-y += t7-a311d2-tvpro-8g.dtb
+dtb-y += t7-a311d2-65t33z-4g.dtb
