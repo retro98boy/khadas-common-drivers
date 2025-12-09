@@ -984,7 +984,7 @@
 			function = LED_FUNCTION_STATUS;
 			color = <LED_COLOR_ID_GREEN>;
 			gpios = <&gpio GPIOM_10 GPIO_ACTIVE_HIGH>;
-			default-state = "on";
+			linux,default-trigger = "heartbeat";
 		};
 	};
 };
