@@ -1387,30 +1387,36 @@
 	status = "disabled";
 };
 
+/* RJ45 Side USB Type-A */
 &crg_udc_2 {
-	status = "okay";
+	status = "disabled";
 };
 
+/* DC Side USB Type-A */
 &crg_udc_3 {
-	status = "disable";
+	status = "disabled";
 };
 
+/* DC Side USB Type-A */
 &crg20_otg {
-	status = "okay";
+	status = "disabled";
 	controller-type = <2>;
 };
 
+/* RJ45 Side USB Type-A */
 &crg21_otg {
-	status = "okay";
+	status = "disabled";
 	controller-type = <2>;
 };
 
+/* RJ45 Side USB Type-A */
 &crg2_drd {
 	/* compatible = "amlogic, crg-drd"; */
 	compatible = "amlogic, crg-host-drd";
 	status = "okay";
 };
 
+/* DC Side USB Type-A */
 &crg3_drd {
 	/* compatible = "amlogic, crg-drd"; */
 	compatible = "amlogic, crg-host-drd";
@@ -1432,6 +1438,11 @@
 	portnum = <1>;
 };
 
+/*
+ * On the A311D2, this Corigine USB module only exposes USB 2.0,
+ * which can be used for firmware download during BootROM.
+ * Therefore, the port number (portnum) for USB 3.0 is 0.
+ */
 &crg3_phy_21 {
 	status = "okay";
 	portnum = <0>;
