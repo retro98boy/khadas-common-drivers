@@ -22,7 +22,7 @@
 #include <dt-bindings/leds/common.h>
 
 / {
-	model = "CoreLab A311D2-TVPro";
+	model = "CoreLab TVPro";
 	amlogic-dt-id = "t7-a311d2-tvpro-8g";
 	compatible = "t7-a311d2-tvpro-8g";
 	interrupt-parent = <&gic>;
