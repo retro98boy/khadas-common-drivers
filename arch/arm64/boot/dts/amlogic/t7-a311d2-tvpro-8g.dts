@@ -352,30 +352,7 @@
 		regulator-max-microvolt = <3300000>;
 		gpios = <&gpio GPIOD_9 GPIO_ACTIVE_HIGH>;
 		gpios-states = <1>;
-		states = <1800000 1
-					3300000 0>;
-	};
-
-	usb_power: regulator-usb-power {
-		compatible = "regulator-fixed";
-		enable-active-high;
-		gpio = <&gpio GPIOH_4 GPIO_ACTIVE_HIGH>;
-		regulator-name = "usb_power";
-		regulator-min-microvolt = <5000000>;
-		regulator-max-microvolt = <5000000>;
-		regulator-always-on;
-		regulator-boot-on;
-	};
-
-	otg_power: regulator-otg-power {
-		compatible = "regulator-fixed";
-		enable-active-high;
-		gpio = <&gpio GPIOH_5 GPIO_ACTIVE_HIGH>;
-		regulator-name = "otg_power";
-		regulator-min-microvolt = <5000000>;
-		regulator-max-microvolt = <5000000>;
-		regulator-always-on;
-		regulator-boot-on;
+		states = <1800000 1 3300000 0>;
 	};
 
 	codec_mm {
@@ -1032,11 +1009,15 @@
 &crg_phy_20 {
 	status = "okay";
 	portnum = <1>;
+	gpio-vbus-power = "GPIOH_4";
+	gpios = <&gpio GPIOH_4 GPIO_ACTIVE_HIGH>;
 };
 
 &crg_phy_21 {
 	status = "okay";
 	portnum = <1>;
+	gpio-vbus-power = "GPIOH_5";
+	gpios = <&gpio GPIOH_5 GPIO_ACTIVE_HIGH>;
 };
 
 &crg3_phy_20 {
