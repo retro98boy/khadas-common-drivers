@@ -61,7 +61,7 @@
 		mmc1 = &sd_emmc_b;
 		mmc2 = &sd_emmc_a;
 		rtc0 = &hym8563;
-		rtc99 = &vrtc;
+		rtc1 = &vrtc;
 	};
 
 	memory@00000000 {
@@ -806,7 +806,6 @@
 
 	gpio_keypad {
 		compatible = "amlogic, gpio_keypad";
-		status = "okay";
 		scan_period = <20>;
 		key_num = <1>;
 		key_name = "power";
@@ -1050,7 +1049,6 @@
 
 /* SDIO */
 &sd_emmc_a {
-	status = "okay";
 	pinctrl-0 = <&sdio_pins>;
 	pinctrl-1 = <&sdio_clk_gate_pins>;
 	pinctrl-names = "default", "clk-gate";
@@ -1079,13 +1077,10 @@
 
 /* SD card */
 &sd_emmc_b {
-	status = "okay";
 	pinctrl-0 = <&sd_all_pins>;
 	pinctrl-1 = <&sd_1bit_pins>;
 	pinctrl-2 = <&sd_clk_gate_pins>;
-	pinctrl-names = "sd_default",
-			"sd_1bit_pins",
-			"clk-gate";
+	pinctrl-names = "sd_default", "sd_1bit_pins", "clk-gate";
 	bus-width = <4>;
 	cap-sd-highspeed;
 	sd-uhs-sdr12;
@@ -1104,7 +1099,6 @@
 
 /* eMMC */
 &sd_emmc_c {
-	status = "okay";
 	pinctrl-0 = <&emmc_pins>, <&emmc_ds_pins>;
 	pinctrl-1 = <&emmc_clk_gate_pins>;
 	pinctrl-names = "default", "clk-gate";
@@ -1126,16 +1120,13 @@
 	*/
 };
 
-&saradc {
-	status = "okay";
-};
-
 &ext_mdio {
-	rtl8211f: rtl8211f@0 {
+	rtl8211f: ethernet-phy@0 {
 		reg = <0>;
 		max-speed = <1000>;
 		reset-assert-us = <20000>;
 		reset-deassert-us = <50000>;
+		reset-gpios = <&gpio GPIOT_14 GPIO_ACTIVE_HIGH>;
 	};
 };
 
@@ -1151,13 +1142,12 @@
 	amlogic,tx-delay-ns = <2>;
 };
 
-/* debug */
+/* Debug */
 &uart_A {
 	status = "okay";
 };
 
 &isp {
-	status = "okay";
 	temper-line-offset = <0x1680>;
 	temper-buf-size = <6>;
 	temper-frame-num = <1>;
@@ -1174,7 +1164,6 @@
 };
 
 &adapter {
-	status = "okay";
 	mem_alloc = <32>;
 	mem_alloc1 = <16>;
 	mem_alloc2 = <16>;
@@ -1185,7 +1174,7 @@
 	mux {
 		groups = "spi3_mosi",
 			 "spi3_miso",
-			 "spi3_ss0",
+			 "spi3_ss0", /* GPIOT_9 */
 			 "spi3_sclk";
 		function = "spi3";
 		drive-strength-microamp = <2000>;
@@ -1233,10 +1222,12 @@
 			reg = <2>;
 			remote-endpoint = <&lcd0_to_drm>;
 		};
+
 		drm_to_lcd1: endpoint@3 {
 			reg = <3>;
 			remote-endpoint = <&lcd1_to_drm>;
 		};
+
 		drm_to_lcd2: endpoint@4 {
 			reg = <4>;
 			remote-endpoint = <&lcd2_to_drm>;
@@ -1254,6 +1245,7 @@
 		port {
 			#address-cells = <1>;
 			#size-cells = <0>;
+
 			lcd0_to_drm: endpoint@0 {
 				reg = <0>;
 				remote-endpoint = <&drm_to_lcd0>;
@@ -1285,7 +1277,6 @@
 };
 
 &amhdmitx {
-	status = "okay";
 	repeater_tx = <0>;
 	enc_idx = <2>;
 	vrr_type = <2>; /* 1: GAME-VRR, 2: QMS-VRR */
@@ -1295,22 +1286,12 @@
 	max_refreshrate = <120>; /* SH-17689 DEBUG*/
 };
 
-/* if you want to use vdin just modify status to "okay" */
+/*
+ * For detailed meanings of the numbers,
+ * see the vdinN node in mesont7.dtsi.
+ */
 &vdin0 {
 	/* memory-region = <&vdin0_cma_reserved>; */
-	status = "okay";
-	/*
-	 * MByte, if 10bit disable: 64M(YUV422),
-	 * if 10bit enable: 64 * 1.5 = 96M(YUV422)
-	 * if support 4K2K-YUV444-10bit-WR: 3840 * 2160 * 4 * 4 ~= 128M
-	 * if support 4K2K-YUV422-10bit-wr: 3840 * 2160 * 3 * 4 ~= 96M
-	 * if support 4K2K-YUV422-8BIT-WR: 3840 * 2160 * 2 * 4 ~= 64M
-	 * if support 1080p-YUV422-8BIT-WR: 1920 * 1080 * 2 * 4 ~= 16M
-	 *  onebuffer:
-	 *  worst case: (4096 * 2160 * 3 + 2M(afbce issue)) = 27.5M
-	 *  dw: 960 x 540 x 3 = 1.5M
-	 *  total size: (27.5 + 1.5) x buffernumber
-	 */
 	cma_size = <280>;
 	frame_buff_num = <10>;
 	vdin_function_sel = <0x101>;
@@ -1318,7 +1299,6 @@
 
 &vdin1 {
 	memory-region = <&vdin1_cma_reserved>;
-	status = "okay";
 	vdin_function_sel = <0x400>;
 };
 
@@ -1391,27 +1371,25 @@
 	status = "okay";
 	pinctrl-0 = <&remote_pins>;
 	pinctrl-names = "default";
-	/* For linux platforms, use custom_maps_linux to override the default custom_maps in the IR */
+	/*
+	 * For linux platforms,
+	 * use custom_maps_linux to override the default custom_maps.
+	 * See meson-ir-map-linux.dtsi
+	 */
 	map = <&custom_maps_linux>;
 };
 
+/*
+ * For detailed meanings of the numbers,
+ * see the amlvecm node in mesont7.dtsi.
+ */
 &amlvecm {
-	status = "okay";
-	gamma_en = <0>; /* 1: enable; 0: disable */
-	wb_en = <0>; /* 1: enable; 0: disable */
-	cm_en = <0>; /* 1: enable; 0: disable */
-	wb_sel = <0>; /* 1: mtx; 0: gainoff */
-	vlock_en = <1>; /* 1: enable; 0: disable */
+	gamma_en = <0>;
+	wb_en = <0>;
+	cm_en = <0>;
+	wb_sel = <0>;
+	vlock_en = <1>;
 	vlock_mode = <0x8>;
-	/*
-	 * vlock work mode
-	 * bit0: auto ENC
-	 * bit1: auto PLL
-	 * bit2: manual PLL
-	 * bit3: manual ENC
-	 * bit4: manual soft ENC
-	 * bit5: manual MIX PLL ENC
-	 */
 	vlock_pll_m_limit = <1>;
 	vlock_line_limit = <2>;
 };
@@ -1432,10 +1410,6 @@
 &pwm_ab {
 	pinctrl-0 = <&pwm_a_pins>;
 	pinctrl-names = "default";
-	status = "okay";
-};
-
-&pwm_ef {
 	status = "okay";
 };
 
