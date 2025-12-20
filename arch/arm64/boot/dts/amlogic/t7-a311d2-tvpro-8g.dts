@@ -66,9 +66,9 @@
 
 	memory@00000000 {
 		device_type = "memory";
-		linux,usable-memory = <0x00000000 0x00000000 0x00000000 0xE0000000
-								0x00000001 0x00000000 0x00000000 0xE0000000
-								0x00000002 0x00000000 0x00000000 0x40000000>;
+		linux,usable-memory = <0x00000000 0x00000000 0x00000000 0xe0000000
+													0x00000001 0x00000000 0x00000000 0xe0000000
+													0x00000002 0x00000000 0x00000000 0x40000000>;
 	};
 
 	reserved-memory {
@@ -81,7 +81,7 @@
 			status = "disabled";
 		};
 
-		/* global autoconfigured region for contiguous allocations */
+		/* Global autoconfigured region for contiguous allocations */
 		ramoops@0x07400000 {
 			compatible = "ramoops";
 			reg = <0x0 0x07400000 0x0 0x00100000>;
@@ -159,12 +159,10 @@
 		ge2d_cma_reserved: linux,ge2d_cma {
 			compatible = "shared-dma-pool";
 			reusable;
-			status = "okay";
 			size = <0x0 0x1800000>;
 			alignment = <0x0 0x400000>;
 		};
 
-		/* di CMA pool */
 		di_cma_reserved: linux,di_cma {
 			compatible = "shared-dma-pool";
 			reusable;
@@ -175,13 +173,12 @@
 			 * 10 x 4736064 = 45.2M(0x2e) support 12bit
 			 * 10 x 4074560 = 40M(0x28) support 10bit
 			 */
-			/* size = <0x0 0x0B000000>; */
+			/* size = <0x0 0x0b000000>; */
 			size = <0x0 0x0>;
 			alignment = <0x0 0x400000>;
 			alloc-ranges = <0x0 0x0 0x0 0xe0000000>;
 		};
 
-		/* POST PROCESS MANAGER */
 		ppmgr_reserved: linux,ppmgr {
 			compatible = "shared-dma-pool";
 			size = <0x0 0x0>;
@@ -191,7 +188,6 @@
 		isp_cma_reserved: linux,isp_cma {
 			compatible = "shared-dma-pool";
 			reusable;
-			status = "okay";
 			size = <0x0 0x8000000>;
 			alignment = <0x0 0x400000>;
 			alloc-ranges = <0x0 0x0 0x0 0xe0000000>;
@@ -200,7 +196,6 @@
 		adapt_cma_reserved: linux,adapt_cma {
 			compatible = "shared-dma-pool";
 			reusable;
-			status = "okay";
 			size = <0x0 0x4000000>;
 			alignment = <0x0 0x400000>;
 			alloc-ranges = <0x0 0x0 0x0 0xe0000000>;
@@ -252,7 +247,7 @@
 		dmaheap_cma_reserved: heap-gfx {
 			compatible = "shared-dma-pool";
 			reusable;
-			size = <0x0 0x12C00000>;
+			size = <0x0 0x12c00000>;
 			alignment = <0x0 0x400000>;
 		};
 
@@ -263,7 +258,6 @@
 			alignment = <0x0 0x400000>;
 		};
 
-		/* vdin0 CMA pool */
 		/*
 		vdin0_cma_reserved: linux,vdin0_cma {
 		compatible = "shared-dma-pool";
@@ -273,7 +267,6 @@
 		};
 		*/
 
-		/* vdin1 CMA pool */
 		vdin1_cma_reserved: linux,vdin1_cma {
 			compatible = "shared-dma-pool";
 			reusable;
@@ -293,7 +286,7 @@
 			alignment = <0x0 0x400000>;
 		};
 
-		/* global autoconfigured region for contiguous allocations */
+		/* Global autoconfigured region for contiguous allocations */
 		linux,cma {
 			compatible = "shared-dma-pool";
 			reusable;
@@ -304,7 +297,6 @@
 
 		pcie_dma_ops_mm: linux,pcie_dma_ops {
 			compatible = "shared-dma-pool";
-			status = "okay";
 			reusable;
 			size = <0x0 0x20000000>;
 			alignment = <0x0 0x400000>;
@@ -329,7 +321,6 @@
 
 	smmu: aml_smmu {
 		compatible = "amlogic,smmu";
-		status = "okay";
 		#iommu-cells = <1>;
 		memory-region = <&pcie_dma_ops_mm>;
 	};
@@ -349,11 +340,9 @@
 		compatible = "amlogic, codec, mm";
 		memory-region = <&codec_mm_cma &codec_mm_reserved &secure_vdec_reserved>;
 		dev_name = "codec_mm";
-		status = "okay";
 	};
 
 	multi-di {
-		/* status = "okay"; */
 		/***************************************************
 		 * memory: default is 4
 		 *	0: use reserved
@@ -396,7 +385,6 @@
 
 	unifykey {
 		compatible = "amlogic,unifykey";
-		status = "okay";
 		unifykey-num = <19>;
 		unifykey-index-0 = <&keysn_0>;
 		unifykey-index-1 = <&keysn_1>;
@@ -539,7 +527,6 @@
 	/* Do not delete or disable this node, it will cause a kernel panic */
 	sensor: sensor {
 		compatible = "soc, sensor";
-		status = "okay";
 		sensor-name = "os08a10"; /* imx290/os08a10/imx227 */
 		sensor-name-sub = "imx290sub";
 		sensor-name-ssub = "imx290ssub";
@@ -560,13 +547,11 @@
 
 	iq: iq {
 		compatible = "soc, iq";
-		status = "okay";
 		sensor-name = "os08a10"; /* imx290/os08a10/imx227 */
 	};
 
 	lens: lens {
 		compatible = "soc, lens";
-		status = "okay";
 	};
 
 	hdmirx {
@@ -574,22 +559,20 @@
 		#address-cells = <1>;
 		#size-cells = <1>;
 		/* memory-region = <&hdmirx_emp_cma_reserved>; */
-		status = "okay";
 		pinctrl-names = "hdmirx_pins";
-		pinctrl-0 = <&hdmirx_a_mux &hdmirx_b_mux
-			&hdmirx_c_mux>;
+		pinctrl-0 = <&hdmirx_a_mux &hdmirx_b_mux &hdmirx_c_mux>;
 		repeat = <0>;
 		power-domains = <&pwrdm PDID_T7_HDMIRX>;
 		interrupts = <0 57 IRQ_TYPE_LEVEL_HIGH>;
 		clocks = <&clkc CLKID_HDMIRX_CFG>,
-			   <&clkc CLKID_HDMIRX_ACR>,
-			   <&clkc CLKID_HDMIRX_METER>,
-			   <&clkc CLKID_HDMIRX_2M>,
-			   <&clkc CLKID_HDMIRX_5M>,
-			   <&clkc CLKID_HDMIRX_HDCP>,
-			   <&xtal>,
-			   <&clkc CLKID_FCLK_DIV4>,
-			   <&clkc CLKID_FCLK_DIV5>;
+				<&clkc CLKID_HDMIRX_ACR>,
+				<&clkc CLKID_HDMIRX_METER>,
+				<&clkc CLKID_HDMIRX_2M>,
+				<&clkc CLKID_HDMIRX_5M>,
+				<&clkc CLKID_HDMIRX_HDCP>,
+				<&xtal>,
+				<&clkc CLKID_FCLK_DIV4>,
+				<&clkc CLKID_FCLK_DIV5>;
 		clock-names = "hdmirx_cfg_clk",
 				"cts_hdmirx_acr_ref_clk",
 				"cts_hdmirx_meter_clk",
@@ -744,44 +727,37 @@
 		compatible = "amlogic, gpiomem";
 		reg = <0x0 0xfe004000 0x0 0x1000>;
 		dev_name = "gpiomem";
-		status = "okay";
 	};
 
 	picdec {
 		compatible = "amlogic, picdec";
-		status = "okay";
 	};
 
 	ppmgr {
 		compatible = "amlogic, ppmgr";
 		memory-region = <&ppmgr_reserved>;
 		dev_name = "ppmgr";
-		status = "okay";
 	};
 
 	video_queue {
 		compatible = "amlogic, video_queue";
 		dev_name = "videoqueue";
-		status = "okay";
 	};
 
 	amdolby_vision {
 		compatible = "amlogic, dolby_vision_t7";
 		dev_name = "aml_amdolby_vision_driver";
-		status = "okay";
 		tv_mode = <0>; /* 1: enable, 0: disable */
 	};
 
 	ionvideo {
 		compatible = "amlogic, ionvideo";
 		dev_name = "ionvideo";
-		status = "okay";
 	};
 
 	amlvideo2_0 {
 		compatible = "amlogic, amlvideo2";
 		dev_name = "amlvideo2";
-		status = "okay";
 		amlvideo2_id = <0>;
 		cma_mode = <1>;
 	};
@@ -789,7 +765,6 @@
 	amlvideo2_1 {
 		compatible = "amlogic, amlvideo2";
 		dev_name = "amlvideo2";
-		status = "okay";
 		amlvideo2_id = <1>;
 		cma_mode = <1>;
 	};
@@ -1042,6 +1017,7 @@
 	pinctrl-0 = <&sdio_pins>;
 	pinctrl-1 = <&sdio_clk_gate_pins>;
 	pinctrl-names = "default", "clk-gate";
+
 	#address-cells = <1>;
 	#size-cells = <0>;
 
@@ -1050,14 +1026,8 @@
 	sd-uhs-sdr50;
 	sd-uhs-sdr104;
 	max-frequency = <200000000>;
-
 	non-removable;
 	disable-wp;
-
-	/*
-	vmmc-supply = <&vddao_3v3>;
-	vqmmc-supply = <&vddio_ao1v8>;
-	*/
 
 	brcmf: wifi@1 {
 		reg = <1>;
@@ -1069,7 +1039,7 @@
  * SD card
  * The cmd pull-up voltage is fixed at 3.3V,
  * unlike the VIM4 which can switch between 1.8V and 3.3V via GPIO.
- * Therefore, it does not have the vqmmc-supply.
+ * Therefore, it does not need the vqmmc-supply.
  */
 &sd_emmc_b {
 	pinctrl-0 = <&sd_all_pins>;
@@ -1083,6 +1053,7 @@
 	sd-uhs-sdr25;
 	sd-uhs-sdr50;
 	sd-uhs-sdr104;
+	sd-uhs-ddr50;
 	max-frequency = <200000000>;
 	disable-wp;
 
@@ -1101,16 +1072,10 @@
 	mmc-ddr-1_8v;
 	mmc-hs200-1_8v;
 	mmc-hs400-1_8v;
-	/* mmc-hs400-enhanced-strobe; */
+	mmc-hs400-enhanced-strobe;
 	max-frequency = <200000000>;
 	non-removable;
 	disable-wp;
-
-	/*
-	mmc-pwrseq = <&emmc_pwrseq>;
-	vmmc-supply = <&vddao_3v3>;
-	vqmmc-supply = <&vddao_1v8>;
-	*/
 };
 
 &ext_mdio {
@@ -1297,66 +1262,27 @@
 
 &periphs_pinctrl {
 	lcd_vbyone_a_off_pins: lcd_vbyone_a_off_pin {
-		mux {
-			groups = "GPIOY_10","GPIOY_12";
-			function = "gpio_periphs";
-			input-enable;
-		};
 	};
 
 	lcd_vbyone_b_off_pins: lcd_vbyone_b_off_pin {
-		mux {
-			groups = "GPIOY_11","GPIOY_13";
-			function = "gpio_periphs";
-			input-enable;
-		};
 	};
 
 	lcd_edp_a_off_pins: lcd_edp_a_off_pin {
-		mux {
-			groups = "GPIOY_10";
-			function = "gpio_periphs";
-			input-enable;
-		};
 	};
 
 	lcd_edp_b_off_pins: lcd_edp_b_off_pin {
-		mux {
-			groups = "GPIOY_11";
-			function = "gpio_periphs";
-			input-enable;
-		};
 	};
 
 	bl_pwm_vs_on_pins: bl_pwm_vs_on_pin {
-		mux {
-			groups = "pwm_vs_y";
-			function = "pwm_vs";
-		};
 	};
 
 	bl_pwm_vs_off_pins: bl_pwm_vs_off_pin {
-		mux {
-			groups = "GPIOY_14";
-			function = "gpio_periphs";
-			output-low;
-		};
 	};
 
 	bl_pwm_off_pins: bl_pwm_off_pin {
-		mux {
-			groups = "GPIOY_1";
-			function = "gpio_periphs";
-			output-low;
-		};
 	};
 
 	bl1_pwm_off_pins: bl1_pwm_off_pin {
-		mux {
-			groups = "GPIOY_8";
-			function = "gpio_periphs";
-			output-low;
-		};
 	};
 };
 
