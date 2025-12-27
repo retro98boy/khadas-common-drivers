@@ -344,6 +344,15 @@
 		regulator-always-on;
 	};
 
+	regulator-phy-pwr {
+		compatible = "regulator-fixed";
+		regulator-name = "phy_pwr";
+		gpio = <&gpio GPIOD_9 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		regulator-boot-on;
+		regulator-always-on;
+	};
+
 	codec_mm {
 		compatible = "amlogic, codec, mm";
 		memory-region = <&codec_mm_cma &codec_mm_reserved &secure_vdec_reserved>;
