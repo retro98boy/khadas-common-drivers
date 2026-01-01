@@ -629,7 +629,7 @@ static int imx378_ctrls_init(struct imx378 *imx378)
 	v4l2_ctrl_handler_init(&imx378->ctrls, 7);
 
 	v4l2_ctrl_new_std(&imx378->ctrls, &imx378_ctrl_ops,
-				V4L2_CID_GAIN, 0, 0xF0, 1, 0);
+				V4L2_CID_GAIN, 0, 0xFFFF, 1, 0);
 
 	v4l2_ctrl_new_std(&imx378->ctrls, &imx378_ctrl_ops,
 				V4L2_CID_EXPOSURE, 0, 0x7fffffff, 1, 0);

@@ -12,9 +12,11 @@
 
 /* supported link frequencies */
 #define FREQ_INDEX_2160P    0
+#define FREQ_INDEX_2160P_HDR 1
 
 static const s64 imx585_link_freq_4lanes[] = {
 	[FREQ_INDEX_2160P] = 1440000000,
+	[FREQ_INDEX_2160P_HDR] = 1440000000,
 };
 
 static inline const s64 *imx585_link_freqs_ptr(const struct imx585 *imx585)
@@ -40,6 +42,18 @@ static const struct imx585_mode imx585_modes_4lanes[] = {
 		},
 		.data = imx585_4lane_3840_2160_1440m_60fps,
 		.data_size = ARRAY_SIZE(imx585_4lane_3840_2160_1440m_60fps),
+	},
+	{
+		.width = 3840,
+		.height = 2160,
+		.hmax = 0x0226,
+		.link_freq_index = FREQ_INDEX_2160P_HDR,
+		.max_fps = {
+			.numerator = 10000,
+			.denominator = 600000,
+		},
+		.data = dol_hdr_4k_30fps_1440Mbps_4lane_10bits,
+		.data_size = ARRAY_SIZE(dol_hdr_4k_30fps_1440Mbps_4lane_10bits),
 	},
 };
 
@@ -147,25 +161,32 @@ static int imx585_set_gain(struct imx585 *imx585, u32 value)
 {
 	int ret = 0;
 	u8 val;
-	//pr_err("%s gain value 0x%x", __func__, value);
 	ret = imx585_write_buffered_reg(imx585, IMX585_GAIN, 2, value);
 	if (ret)
-		dev_err(imx585->dev, "Unable to write gain\n");
 	imx585_read_reg(imx585, IMX585_GAIN, &val);
-	//pr_err("%s read gain value 0x%x", __func__, val);
 	imx585_read_reg(imx585, IMX585_GAIN+1, &val);
-	//pr_err("%s read gain value 0x%x", __func__, val);
 	return ret;
 }
 
 static int imx585_set_exposure(struct imx585 *imx585, u32 value)
 {
 	int ret = 0;
+	int shr0_reg = value & 0xFFFF;
+	int shr1_reg = (value >> 16) & 0xFFFF;
 	u8 val;
-	//pr_err("%s expor value 0x%x", __func__, value);
-	ret = imx585_write_buffered_reg(imx585, IMX585_EXPOSURE, 2, value & 0xFFFF);
+	//pr_err("%s exporL value 0x%x, exporS value 0x%x", __func__, shr0_reg, shr1_reg);
+	ret = imx585_write_buffered_reg(imx585, IMX585_EXPOSURE, 2, shr0_reg);
 	if (ret)
 		dev_err(imx585->dev, "Unable to write expo\n");
+	if (imx585->enWDRMode) {
+		ret = imx585_write_buffered_reg(imx585, IMX585_EXPOSURE_SHR1, 2, shr1_reg);
+		//dev_info(imx585->dev,"expo 0x%x reg value: SHR0-F1-big 0x%x SHR1-f0-small 0x%x", value, shr0_reg , shr1_reg);
+		if (ret)
+			dev_err(imx585->dev, "Unable to write exposure SHR1 reg\n");
+	}
+
+
+
 	imx585_read_reg(imx585, IMX585_EXPOSURE, &val);
 	//pr_err("%s read exp value 0x%x", __func__, val);
 	val = 0;
@@ -417,15 +438,23 @@ static int imx585_set_fmt(struct v4l2_subdev *sd,
 
 	mutex_unlock(&imx585->lock);
 
-	/* Set init register settings */
-	ret = imx585_set_register_array(imx585, imx585_4lane_3840_2160_1440m_60fps,
-		ARRAY_SIZE(imx585_4lane_3840_2160_1440m_60fps));
-	if (ret < 0) {
-		dev_err(imx585->dev, "Could not set init registers\n");
-		return ret;
-	} else
-		dev_err(imx585->dev, "imx678 linear mode init...\n");
-
+	if (imx585->enWDRMode) {
+		ret = imx585_set_register_array(imx585, dol_hdr_4k_30fps_1440Mbps_4lane_10bits,
+			ARRAY_SIZE(dol_hdr_4k_30fps_1440Mbps_4lane_10bits));
+		if (ret < 0) {
+			dev_err(imx585->dev, "Could not set init wdr registers\n");
+			return ret;
+		} else
+			dev_err(imx585->dev, "imx585 wdr mode init...\n");
+	} else {/* Set init register settings */
+		ret = imx585_set_register_array(imx585, imx585_4lane_3840_2160_1440m_60fps,
+			ARRAY_SIZE(imx585_4lane_3840_2160_1440m_60fps));
+		if (ret < 0) {
+			dev_err(imx585->dev, "Could not set init registers\n");
+			return ret;
+		} else
+			dev_err(imx585->dev, "imx585 linear mode init...\n");
+	}
 	return 0;
 }
 
@@ -678,10 +707,10 @@ static int imx585_ctrls_init(struct imx585 *imx585)
 	v4l2_ctrl_handler_init(&imx585->ctrls, 7);
 
 	v4l2_ctrl_new_std(&imx585->ctrls, &imx585_ctrl_ops,
-				V4L2_CID_GAIN, 0, 0xF0, 1, 0);
+				V4L2_CID_GAIN, 0, 0xffff, 1, 0);
 
 	v4l2_ctrl_new_std(&imx585->ctrls, &imx585_ctrl_ops,
-				V4L2_CID_EXPOSURE, 0, 0xffff, 1, 0);
+				V4L2_CID_EXPOSURE, 0, 0x7fffffff, 1, 0);
 
 	imx585->link_freq = v4l2_ctrl_new_int_menu(&imx585->ctrls,
 					       &imx585_ctrl_ops,

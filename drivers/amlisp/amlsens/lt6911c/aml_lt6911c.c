@@ -482,7 +482,7 @@ static int lt6911c_ctrls_init(struct lt6911c *lt6911c) {
 	int rtn = 0;
 	v4l2_ctrl_handler_init(&lt6911c->ctrls, 7);
 	v4l2_ctrl_new_std(&lt6911c->ctrls, &lt6911c_ctrl_ops,
-				V4L2_CID_GAIN, 0, 0xF0, 1, 0);
+				V4L2_CID_GAIN, 0, 0xffff, 1, 0);
 	v4l2_ctrl_new_std(&lt6911c->ctrls, &lt6911c_ctrl_ops,
 				V4L2_CID_EXPOSURE, 0, 0xffff, 1, 0);
 	lt6911c->link_freq = v4l2_ctrl_new_int_menu(&lt6911c->ctrls,

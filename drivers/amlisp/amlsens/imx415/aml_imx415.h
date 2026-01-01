@@ -21,6 +21,8 @@
 
 #define IMX415_GAIN			0x3090
 #define IMX415_EXPOSURE		0x3050
+#define IMX415_EXPOSURE_SHR0  IMX415_EXPOSURE
+#define IMX415_EXPOSURE_SHR1  0x3054
 #define IMX415_ID			0x0602
 #define IMX415_SLAVE_ID		0x001A
 
@@ -230,8 +232,8 @@ static const struct imx415_regval dol_4k_30fps_1440Mbps_4lane_10bits[] = {
 
 	{0x3008, 0x54},
 	{0x300A, 0x3B},
-	{0x3024, 0xD0},
-	{0x3028, 0x14},
+	{0x3024, 0xD0}, // vmax 0x08d0
+	{0x3028, 0x15}, // hmax 0x0215
 	{0x302C, 0x01},
 	{0x302D, 0x01},
 	{0x3031, 0x00},
