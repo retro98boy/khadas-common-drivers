@@ -618,14 +618,18 @@ static int imx585_log_status(struct v4l2_subdev *sd)
 
 int imx585_sbdev_open(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh) {
 	struct imx585 *imx585 = to_imx585(sd);
-	imx585_power_on(imx585->dev, imx585->gpio);
+
+	if (atomic_inc_return(&imx585->open_count) == 1)
+		imx585_power_on(imx585->dev, imx585->gpio);
 	return 0;
 }
 
 int imx585_sbdev_close(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh) {
 	struct imx585 *imx585 = to_imx585(sd);
 	imx585_set_stream(sd, 0);
-	imx585_power_off(imx585->dev, imx585->gpio);
+
+	if (atomic_dec_and_test(&imx585->open_count))
+		imx585_power_off(imx585->dev, imx585->gpio);
 	return 0;
 }
 

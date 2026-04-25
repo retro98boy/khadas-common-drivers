@@ -264,7 +264,6 @@ struct adapter_dev_t {
 	const struct adapter_dev_ops *ops;
 
 	struct aml_video video[AML_ADAP_STREAM_MAX];
-	struct timer_list fe_check_timer;
 };
 
 void adap_subdev_suspend(struct adapter_dev_t *adap_dev);

@@ -72,6 +72,7 @@ struct ov08a10 {
 	int status;
 	struct mutex lock;
 	int fps;
+	atomic_t open_count;
 };
 
 struct ov08a10_pixfmt {

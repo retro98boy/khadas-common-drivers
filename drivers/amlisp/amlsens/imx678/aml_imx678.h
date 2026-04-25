@@ -73,6 +73,7 @@ struct imx678 {
 	int status;
 	struct mutex lock;
 	int fps;
+	atomic_t open_count;
 };
 
 struct imx678_pixfmt {

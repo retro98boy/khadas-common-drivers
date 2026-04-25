@@ -72,6 +72,7 @@ struct imx585 {
 	int status;
 	struct mutex lock;
 	int fps;
+	atomic_t open_count;
 };
 
 struct imx585_pixfmt {

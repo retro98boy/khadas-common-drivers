@@ -52,7 +52,7 @@ static int video_verify_fmt(struct aml_video *video, struct v4l2_format *fmt)
 
 	for (i = 0; i < video->fmt_cnt; i++) {
 		if (fmt->fmt.pix.pixelformat == video->format[i].fourcc) {
-			fmt->fmt.pix.sizeimage = DATA_ALIGN(fmt->fmt.pix.width, 64) *
+			fmt->fmt.pix.sizeimage = DATA_ALIGN(fmt->fmt.pix.width, 16) *
 					fmt->fmt.pix.height *
 					video->format[i].bpp / 8;
 			rtn = 0;
@@ -292,7 +292,7 @@ static int video_ioctl_qbuf(struct file *file, void *priv, struct v4l2_buffer *p
 
 	rtn = vb2_ioctl_qbuf(file, priv, p);
 	if (rtn)
-		pr_err("Failed to dqubuf: %d\n", rtn);
+		pr_err("Failed to qubuf: %d\n", rtn);
 
 	return rtn;
 }

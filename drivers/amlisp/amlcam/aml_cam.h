@@ -24,6 +24,7 @@
 #include "cam_csiphy/aml_csiphy.h"
 #include "cam_adapter/aml_adapter.h"
 #include "cam_pattern/aml_pattern.h"
+#include "cam_common/aml_debug.h"
 
 #define AML_CAM_DRIVER_NAME	"aml-cam"
 #define AML_CAM_BUS_INFO	"platform:" AML_CAM_DRIVER_NAME
@@ -49,6 +50,7 @@ struct cam_device {
 	struct adapter_dev_t adap_dev;
 	struct isp_dev_t isp_dev;
 	struct pattern_dev_t pattern;
+
 };
 
 #endif /* __AML_CAM_H__ */

@@ -51,19 +51,9 @@ static const struct imx290_mode imx290_modes_2lanes[] = {
 		.width = 1920,
 		.height = 1080,
 		.hmax = 0x1130,
-		.data = imx290_1080p_settings,
-		.data_size = ARRAY_SIZE(imx290_1080p_settings),
-
+		.data = linear_1080_30fps_446Mbps_2lane_12bits,
+		.data_size = ARRAY_SIZE(linear_1080_30fps_446Mbps_2lane_12bits),
 		.link_freq_index = FREQ_INDEX_1080P,
-	},
-	{
-		.width = 1280,
-		.height = 720,
-		.hmax = 0x19c8,
-		.data = imx290_720p_settings,
-		.data_size = ARRAY_SIZE(imx290_720p_settings),
-
-		.link_freq_index = FREQ_INDEX_720P,
 	},
 };
 

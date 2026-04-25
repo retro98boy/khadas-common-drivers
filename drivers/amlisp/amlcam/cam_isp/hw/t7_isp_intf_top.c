@@ -135,6 +135,13 @@ void isp_intf_top_cfg_buf(struct isp_dev_t *isp_dev, struct aml_format *fmt, str
 		isp_hwreg_update_bits(isp_dev, ISP_MCNR_HW_CTRL0, 1, 31, 1);
 		isp_hwreg_update_bits(isp_dev, ISP_INTF_TOP_CTRL, 0, 0, 1);
 		isp_hwreg_update_bits(isp_dev, ISP_MCNR_HW_CTRL0, 0, 31, 1);
+	} else {
+		// called before isp_status is STATUS_START;
+		// will sequencely store all following 4 dma write cmd in fixed reg buf.
+		isp_reg_update_bits(isp_dev, ISP_INTF_TOP_CTRL, 1, 0, 1);
+		isp_reg_update_bits(isp_dev, ISP_MCNR_HW_CTRL0, 1, 31, 1);
+		isp_reg_update_bits(isp_dev, ISP_INTF_TOP_CTRL, 0, 0, 1);
+		isp_reg_update_bits(isp_dev, ISP_MCNR_HW_CTRL0, 0, 31, 1);
 	}
 }
 

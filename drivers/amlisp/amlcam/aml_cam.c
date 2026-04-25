@@ -33,7 +33,24 @@
 #ifdef DEBUG_TEST_MIPI_RESET
 extern int debug_test_mipi_reset;
 #endif
+#define AML_CAM_CLASS_NAME "camera"
 
+static int init_aml_cam_debugfs(void);
+
+static int remove_aml_cam_debugfs(void);
+
+static CLASS_ATTR_RO(show_sof_debug);
+
+static struct attribute *aml_cam_class_attrs[] = {
+	&class_attr_show_sof_debug.attr,
+	NULL
+};
+ATTRIBUTE_GROUPS(aml_cam_class);
+
+static struct class aml_cam_class = {
+	.name = AML_CAM_CLASS_NAME,
+	.class_groups = aml_cam_class_groups,
+};
 
 static int cam_subdevs_register(struct cam_device *cam_dev)
 {
@@ -136,7 +153,6 @@ static int cam_create_csiphy_adap_links(struct cam_device *cam_dev)
 	struct media_entity *csiphy = &cam_dev->csiphy_dev.sd.entity;
 	struct media_entity *adap = &cam_dev->adap_dev.sd.entity;
 
-	flags = MEDIA_LNK_FL_ENABLED;
 	rtn = media_create_pad_link(csiphy, AML_CSIPHY_PAD_SRC,
 				adap, AML_ADAP_PAD_SINK, flags);
 	if (rtn) {
@@ -378,6 +394,8 @@ static int cam_async_notifier_complete(struct v4l2_async_notifier *async)
 	dev_info(cam_dev->dev, "Success async notifier complete\n");
 
 	dev_info(cam_dev->dev, "dq check timer setup\n");
+
+	pr_err("dq check timer setup\n");
 
 error_return:
 
@@ -754,7 +772,47 @@ static struct platform_driver cam_driver = {
 	},
 };
 
-module_platform_driver(cam_driver);
+static int init_aml_cam_debugfs(void)
+{
+	int  ret = 0;
+
+	ret = class_register(&aml_cam_class);
+	if (ret < 0) {
+		pr_err("error create aml_cam_dev class\n");
+		return ret;
+	}
+	return ret;
+}
+
+static int remove_aml_cam_debugfs(void)
+{
+	class_unregister(&aml_cam_class);
+	class_destroy(&aml_cam_class);
+	return  0;
+}
+
+static int __init amlcam_drv_init(void)
+{
+	int err;
+	pr_err("amlcam isp platform add drv\n");
+	init_aml_cam_debugfs();
+	err = platform_driver_register(&(cam_driver) );
+	if (err) {
+		pr_err("platform driver register fail. ret %d", err);
+		return err;
+	}
+	return err;
+}
+
+static void __exit amlcam_drv_exit(void)
+{
+	remove_aml_cam_debugfs();
+	platform_driver_unregister(&(cam_driver) );
+}
+
+module_init(amlcam_drv_init);
+module_exit(amlcam_drv_exit);
+
 
 MODULE_AUTHOR("Keke Li");
 MODULE_DESCRIPTION("Amlogic Camera Driver");

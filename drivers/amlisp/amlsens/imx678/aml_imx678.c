@@ -624,14 +624,18 @@ static int imx678_log_status(struct v4l2_subdev *sd)
 
 int imx678_sbdev_open(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh) {
 	struct imx678 *imx678 = to_imx678(sd);
-	imx678_power_on(imx678->dev, imx678->gpio);
+
+	if (atomic_inc_return(&imx678->open_count) == 1)
+		imx678_power_on(imx678->dev, imx678->gpio);
 	return 0;
 }
 
 int imx678_sbdev_close(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh) {
 	struct imx678 *imx678 = to_imx678(sd);
 	imx678_set_stream(sd, 0);
-	imx678_power_off(imx678->dev, imx678->gpio);
+
+	if (atomic_dec_and_test(&imx678->open_count))
+		imx678_power_off(imx678->dev, imx678->gpio);
 	return 0;
 }
 

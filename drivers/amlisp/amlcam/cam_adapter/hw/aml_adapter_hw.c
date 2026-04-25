@@ -592,6 +592,9 @@ static int adap_frontend_init(void *a_dev)
 	//				reg_vfifo_vs_out_pre << 12 |
 	//				reg_lbuf0_vs_sel << 8);
 
+	if (param->mode == MODE_MIPI_RAW_SDR_DIRCT)
+		module_update_bits(a_dev, ALIGN_MD, MIPI_ADAPT_AXI_CTRL0, 0x9, 0, 4);
+
 	return rtn;
 }
 
@@ -1153,13 +1156,12 @@ static void adap_module_reset(void *a_dev)
 	}
 
 	module_reg_write(a_dev, module, CSI2_GEN_CTRL0, 0x00000000);
-	module_update_bits(a_dev, READER_MD, MIPI_ADAPT_TOP_CNTL0, 1, adap_dev->index, 1);
-	udelay(1000);
-	module_update_bits(a_dev, READER_MD, MIPI_ADAPT_TOP_CNTL0, 0, adap_dev->index, 1);
 
 	if (g_info->user)
 		return;
+
 	module_update_bits(a_dev, READER_MD, MIPI_ADAPT_DDR_RD0_CNTL0, 0, 0, 1);
+
 	udelay(1000);
 #ifdef T7C_CHIP
 	module_update_bits(a_dev, PROC_MD, MIPI_TOP_CSI2_CTRL0, 1, 6, 1);
@@ -1168,7 +1170,6 @@ static void adap_module_reset(void *a_dev)
 	module_update_bits(a_dev, PROC_MD, MIPI_PROC_TOP_CTRL0, 1, 2, 1);
 	module_update_bits(a_dev, PROC_MD, MIPI_PROC_TOP_CTRL0, 0, 2, 1);
 #endif
-
 }
 
 static int adap_hw_init(void *a_dev)

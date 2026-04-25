@@ -194,6 +194,8 @@ struct aml_video {
 	const struct aml_format *format;
 	u32 fmt_cnt;
 	u32 frm_cnt;
+    u64 start_time;
+    u64 end_time;
     u32 disp_sel;
 	u32 min_buffer_count;
 	struct aml_crop acrop;

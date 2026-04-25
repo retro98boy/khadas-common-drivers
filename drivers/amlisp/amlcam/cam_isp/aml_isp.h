@@ -175,7 +175,7 @@ struct isp_dev_t {
 
 	const struct isp_dev_ops *ops;
 	const struct emb_ops_t *emb_ops;
-	struct aml_slice aslice[3];
+    struct aml_slice aslice[3];
 	struct aml_video video[AML_ISP_STREAM_MAX];
 	struct timer_list isp_check_timer;
 };
@@ -241,6 +241,10 @@ void isp_global_stream_on(void);
 void isp_global_stream_off(void);
 int isp_global_init(struct isp_dev_t *isp_dev);
 int isp_global_deinit(struct isp_dev_t *isp_dev);
+
+ssize_t show_sof_debug_show(struct class *cla,
+			      struct class_attribute *attr,
+			      char *buf);
 
 extern const struct isp_dev_ops isp_hw_ops;
 extern const struct emb_ops_t emb_hw_ops;

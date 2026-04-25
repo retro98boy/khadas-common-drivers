@@ -710,14 +710,18 @@ static int ov08a10_log_status(struct v4l2_subdev *sd)
 
 int ov08a10_sbdev_open(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh) {
 	struct ov08a10 *ov08a10 = to_ov08a10(sd);
-	ov08a10_power_on(ov08a10->dev, ov08a10->gpio);
+
+	if (atomic_inc_return(&ov08a10->open_count) == 1)
+		ov08a10_power_on(ov08a10->dev, ov08a10->gpio);
 	return 0;
 }
 
 int ov08a10_sbdev_close(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh) {
 	struct ov08a10 *ov08a10 = to_ov08a10(sd);
 	ov08a10_set_stream(sd, 0);
-	ov08a10_power_off(ov08a10->dev, ov08a10->gpio);
+
+	if (atomic_dec_and_test(&ov08a10->open_count))
+		ov08a10_power_off(ov08a10->dev, ov08a10->gpio);
 	return 0;
 }
 
@@ -823,7 +827,7 @@ static int ov08a10_ctrls_init(struct ov08a10 *ov08a10)
 	v4l2_ctrl_handler_init(&ov08a10->ctrls, 9);
 
 	v4l2_ctrl_new_std(&ov08a10->ctrls, &ov08a10_ctrl_ops,
-				V4L2_CID_GAIN, 0, 0xffff, 1, 0);
+				V4L2_CID_GAIN, 0, 0xF0, 1, 0);
 
 	v4l2_ctrl_new_std(&ov08a10->ctrls, &ov08a10_ctrl_ops,
 				V4L2_CID_EXPOSURE, 0, 0xffff, 1, 0);

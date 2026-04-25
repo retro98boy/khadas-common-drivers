@@ -68,16 +68,49 @@ static const struct imx415_mode imx415_modes_4lanes[] = {
 		.data = linear_4k_60fps_1440Mbps_4lane_10bits,
 		.data_size = ARRAY_SIZE(linear_4k_60fps_1440Mbps_4lane_10bits),
 	},
+	{
+		.width = 1920,
+		.height = 1080,
+		.hmax = 0x0898,
+		.link_freq_index = FREQ_INDEX_1080P,
+		.max_fps = {
+			.numerator = 10000,
+			.denominator = 300000,
+		},
+		.data = linear_1080P_30fps_1440Mbps_4lane_10bits,
+		.data_size = ARRAY_SIZE(linear_1080P_30fps_1440Mbps_4lane_10bits),
+	},
+};
+
+static const struct imx415_mode imx415_modes_2lanes[] = {
+	{
+		.width = 3840,
+		.height = 2160,
+		.hmax = 0x0898,
+		.link_freq_index = FREQ_INDEX_1080P,
+		.max_fps = {
+			.numerator = 10000,
+			.denominator = 300000,
+		},
+		.data = linear_4k_30fps_1440Mbps_2lane_10bits,
+		.data_size = ARRAY_SIZE(linear_4k_30fps_1440Mbps_2lane_10bits),
+	},
 };
 
 static inline const struct imx415_mode *imx415_modes_ptr(const struct imx415 *imx415)
 {
-	return imx415_modes_4lanes;
+	if (imx415->nlanes == 2)
+		return imx415_modes_2lanes;
+	else
+		return imx415_modes_4lanes;
 }
 
 static inline int imx415_modes_num(const struct imx415 *imx415)
 {
-	return ARRAY_SIZE(imx415_modes_4lanes);
+	if (imx415->nlanes == 2)
+		return ARRAY_SIZE(imx415_modes_2lanes);
+	else
+		return ARRAY_SIZE(imx415_modes_4lanes);
 }
 
 static inline struct imx415 *to_imx415(struct v4l2_subdev *_sd)
@@ -485,8 +518,8 @@ static int imx415_set_fmt(struct v4l2_subdev *sd,
 			ret = imx415_set_register_array(imx415, linear_4k_60fps_1440Mbps_4lane_10bits,
 				ARRAY_SIZE(linear_4k_60fps_1440Mbps_4lane_10bits));
 		} else {
-			ret = imx415_set_register_array(imx415, linear_4k_30fps_1440Mbps_4lane_10bits,
-				ARRAY_SIZE(linear_4k_30fps_1440Mbps_4lane_10bits));
+			dev_err(imx415->dev, "imx415 wdr mode init... %d ", imx415->current_mode->data_size);
+			ret = imx415_set_register_array(imx415, imx415->current_mode->data, imx415->current_mode->data_size);
 		}
 		if (ret < 0) {
 			dev_err(imx415->dev, "Could not set init registers\n");
@@ -659,7 +692,8 @@ static int imx415_log_status(struct v4l2_subdev *sd)
 int imx415_sbdev_open(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh) {
 	struct imx415 *imx415 = to_imx415(sd);
 
-	imx415_power_on(imx415->dev, imx415->gpio);
+	if (atomic_inc_return(&imx415->open_count) == 1)
+		imx415_power_on(imx415->dev, imx415->gpio);
 
 	return 0;
 }
@@ -668,7 +702,8 @@ int imx415_sbdev_close(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh) {
 	struct imx415 *imx415 = to_imx415(sd);
 
 	imx415_stop_streaming(imx415);
-	imx415_power_off(imx415->dev, imx415->gpio);
+	if (atomic_dec_and_test(&imx415->open_count))
+		imx415_power_off(imx415->dev, imx415->gpio);
 
 	return 0;
 }
@@ -755,7 +790,7 @@ static struct v4l2_ctrl_config vts_cfg = {
 	.min = 1,
 	.max = 0xffff,
 	.step = 1,
-	.def = 2256, //sensor vmax register[0x3025-0x3024]
+	.def = 2328, //sensor vmax register[0x3025-0x3024]
 };
 
 static int imx415_ctrls_init(struct imx415 *imx415)

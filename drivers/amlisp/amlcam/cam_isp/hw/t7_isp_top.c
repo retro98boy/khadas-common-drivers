@@ -133,11 +133,12 @@ void isp_top_decmpr_disable(void *isp_dev)
 void isp_top_reset(void *isp_dev)
 {
 #ifdef T7C_CHIP
-	isp_hwreg_update_bits(isp_dev, MIPI_TOP_CTRL0, 1, 8, 1);
-	isp_hwreg_update_bits(isp_dev, MIPI_TOP_CTRL0, 0, 8, 1);
+    isp_hwreg_update_bits(isp_dev, MIPI_TOP_CTRL0, 1, 8, 1);
+    isp_hwreg_update_bits(isp_dev, MIPI_TOP_CTRL0, 0, 8, 1);
+    isp_hwreg_write(isp_dev, ISP_TOP_IRQ_CLR, 0xffffffff);
 #else
-	isp_hwreg_update_bits(isp_dev, MIPI_TOP_CTRL0, 1, 2, 1);
-	isp_hwreg_update_bits(isp_dev, MIPI_TOP_CTRL0, 0, 2, 1);
+    isp_hwreg_update_bits(isp_dev, MIPI_TOP_CTRL0, 1, 2, 1);
+    isp_hwreg_update_bits(isp_dev, MIPI_TOP_CTRL0, 0, 2, 1);
 #endif
 }
 
@@ -321,7 +322,7 @@ void isp_top_init(struct isp_dev_t *isp_dev)
 
 	isp_reg_update_bits(isp_dev, ISP_FRM_CNT_CTRL, 1, 26, 1);
 
-	isp_reg_write(isp_dev, ISP_TOP_IRQ_EN, 0x1);
+	isp_reg_write(isp_dev, ISP_TOP_IRQ_EN, 0x201);
 
 	top_cfg_normal_path(isp_dev);
 }

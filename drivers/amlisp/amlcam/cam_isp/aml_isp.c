@@ -42,9 +42,14 @@ static struct isp_dev_t *g_isp_dev[4];
 volatile uint32_t debug_isp_irq_in_count = 0;
 volatile uint32_t debug_isp_irq_out_count = 0;
 
+volatile uint32_t debug_sof_count = 0;
+
+
 #ifdef DEBUG_TEST_MIPI_RESET
 volatile int debug_test_mipi_reset = 1;
 #endif
+int debug_show_sof;
+static u64 timestamp[16];
 
 static const struct aml_format isp_subdev_formats[] = {
 	{0, 0, 0, 0, MEDIA_BUS_FMT_SBGGR8_1X8, 0, 1, 8},
@@ -170,6 +175,26 @@ Err:
 
 DEVICE_ATTR(reg, S_IRUGO | S_IWUSR, reg_read, reg_write);
 
+ssize_t show_sof_debug_show(struct class *cla,
+			      struct class_attribute *attr,
+			      char *buf)
+{
+	char buffer[1024];
+	int pos = 0;
+	int i;
+
+	for (i = 0; i < sizeof(timestamp)/sizeof(timestamp[0]); i++) {
+		pos += scnprintf(buffer + pos, sizeof(buffer) - pos, "%llu", timestamp[i]);
+		if (i < (sizeof(timestamp)/sizeof(timestamp[0])) - 1) {
+			pos += scnprintf(buffer + pos, sizeof(buffer) - pos, " ");
+		}
+		if (pos >= sizeof(buffer)) {
+			break;
+		}
+	}
+	return sprintf(buf, "%s\n", buffer);
+}
+
 static void isp_check_timeout(struct timer_list *t)
 {
 	struct isp_dev_t * isp_dev = container_of(t, struct isp_dev_t, isp_check_timer);
@@ -182,6 +207,7 @@ static void isp_check_timeout(struct timer_list *t)
 		vb2_queue_error(&(isp_dev->video[i].vb2_q));
 	}
 }
+
 
 struct isp_dev_t *isp_subdrv_get_dev(int index)
 {
@@ -740,7 +766,9 @@ static irqreturn_t isp_subdev_irq_handler(int irq, void *dev)
 		}
 		tasklet_schedule(&isp_dev->irq_tasklet);
 	}
-
+	if (status & 0x200) {
+		timestamp[debug_sof_count++ % 16] = ktime_get_ns() / 1000 / 1000;
+	}
 	spin_unlock_irqrestore(&isp_dev->irq_lock, flags);
 
 	debug_isp_irq_out_count++;
@@ -952,9 +980,9 @@ int aml_isp_subdev_init(void *c_dev)
 
 	isp_global_init(isp_dev);
 
-	timer_setup(&(isp_dev->isp_check_timer ), isp_check_timeout, 0);
+	pr_info("ISP%u: subdev init\n", isp_dev->index);
 
-	dev_info(isp_dev->dev, "ISP%u: subdev init\n", isp_dev->index);
+	timer_setup(&(isp_dev->isp_check_timer ), isp_check_timeout, 0);
 
 	g_isp_dev[cam_dev->index] = isp_dev;
 

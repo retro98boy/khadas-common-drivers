@@ -99,13 +99,13 @@ void isp_apb_dma_auto_trigger(struct isp_dev_t *isp_dev)
 	isp_hwreg_write(isp_dev, ISP_TOP_RDMA_CTRL, val);
 }
 
-void isp_apb_dma_fill_gisp_rreg_buff(struct isp_global_info *g_isp)
+void isp_apb_dma_fill_gisp_rreg_buff(struct isp_global_info *g_info)
 {
 	u32 i = 0;
 	u32 base_reg = (ISP_TOP_INPUT_SIZE - ISP_BASE) >> 2;
 	u32 max_reg = (ISP_LOSSD_MIX_RO_BIT_LEN_L_3 - ISP_BASE) >> 2;
-	struct isp_dev_t *isp_dev = g_isp->isp_dev;
-	struct aml_reg *rreg = g_isp->rreg_buff.vmaddr[AML_PLANE_A];
+	struct isp_dev_t *isp_dev = g_info->isp_dev;
+	struct aml_reg *rreg = g_info->rreg_buff.vmaddr[AML_PLANE_A];
 
 	for (i = base_reg; i <= max_reg; i++) {
 		rreg[i].addr = i;
